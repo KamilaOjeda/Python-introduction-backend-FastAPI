@@ -59,3 +59,12 @@ Un API para usuarios generales.
 - @decorador, la sintaxis @algo se llama "decorador" en Python.
 - Se pone encima de una función. Es como un lindo sombrero decorado.
 - Un "@decorador" toma la función que tiene inmediatamente debajo y hace algo con ella.
+
+## ENTIDAD:
+- from pydantic import BaseModel
+
+### BASE MODEL
+
+# PATH Y QUERY
+## Parámetros de path
+
