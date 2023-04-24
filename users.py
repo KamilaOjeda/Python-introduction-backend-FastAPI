@@ -39,8 +39,22 @@ async def users():
 # Tenemos una clase que hereda el comportamiento de BaseModel
 # Le damos un nombre relacionado con la opración que va a realizar
 # Le pasamos un parámetro, en este caso será el id
+
+# Path
 @app.get("/user/{id}") # El path /user/{id} tiene un path parameter "id" que debería ser un int.
 async def users(id: int): # Le pasamos el parámetro tipado, en este caso es si o si un entero: int.
+    return search_user(id)
+
+    
+# Limitamos y aseguramos que las peticiones sean las correctas.
+
+# Query
+@app.get("/userquery") # El path /user/{id} tiene un path parameter "id" que debería ser un int. Por otro lado, /userquery tmabién podría llamarse solo /user.
+async def users(id: int): # Le pasamos el parámetro tipado, en este caso es si o si un entero: int.
+    return search_user(id)
+    
+# Función para buscar el usuario por id.
+def search_user(id: int):
     users = filter(lambda user: user.id == id, users_list) # Filter: función pre cargada en python y es una función superior
     try:
         return list(users)[0]

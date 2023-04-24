@@ -67,4 +67,23 @@ Un API para usuarios generales.
 
 # PATH Y QUERY
 ## Parámetros de path
+- Procesos:
+    - Soporte del editor
+    - "Parsing" de datos
+    - Validación de datos
+    - Documentación automática
+## Parámetros de query
+- Cuando declaras otros parámetros de la función que no hacen parte de los parámetros de path estos se interpretan automáticamente como parámetros de "query".
+
+- El query es el conjunto de pares de "key-value" que van después del "?" en la URL, separados por caracteres "&". Ejemplo:
+
+    - En la URL: http://127.0.0.1:8000/items/?skip=0&limit=10
+    ...los parámetros de query son:
+        - skip: con un valor de 0
+        - limit: con un valor de 10
+    Como son parte de la URL, son "strings".
+    Pero cuando se declaran con tipos de Python (como int) son convertidos a ese tipo y son validados con él.
+    Se aplican los mismos procesos de los parámetros de path.
+
+
 
