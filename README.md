@@ -38,7 +38,7 @@ Operación se refiere a uno de los "métodos" de HTTP, que serían las peticione
 
 - POST: para crear datos
 - GET: para leer datos
-- PUT: para actualizae datos
+- PUT: para actualizar datos
 - DELETE: para borrar datos
 
 Y otros exóticos:
@@ -67,12 +67,16 @@ Un API para usuarios generales.
 
 # PATH Y QUERY
 ## Parámetros de path
+- Para los parámetros que van fijos y son obligatorios.
+
 - Procesos:
     - Soporte del editor
     - "Parsing" de datos
     - Validación de datos
     - Documentación automática
-## Parámetros de query
+## Parámetros de query 
+- Para parámetros que pueden no ser necesarios para hacer la petición. (Paginación, scroll)
+
 - Cuando declaras otros parámetros de la función que no hacen parte de los parámetros de path estos se interpretan automáticamente como parámetros de "query".
 
 - El query es el conjunto de pares de "key-value" que van después del "?" en la URL, separados por caracteres "&". Ejemplo:
@@ -84,6 +88,7 @@ Un API para usuarios generales.
     Como son parte de la URL, son "strings".
     Pero cuando se declaran con tipos de Python (como int) son convertidos a ese tipo y son validados con él.
     Se aplican los mismos procesos de los parámetros de path.
+## Operaciones POST - PUT - DELETE
 
 
 
