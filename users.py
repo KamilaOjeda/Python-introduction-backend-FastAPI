@@ -13,13 +13,14 @@ async def users():
 # Entidad user
 
 class User(BaseModel): # Base Model nos da la capacidad de crear una entidad.
+    id: int
     name: str # objeto de tipo Usuario, el nam tiene que ser String
     surname: str
     url: str
     age: int
 
-users_list = [User(name= "Natalia", surname="Nati", url="https://nati.com", age="35"),
-              User(name= "Rodrigo", surname="Rodri", url="https://rodri.com", age="25")]
+users_list = [User(id= 1, name= "Natalia", surname="Nati", url="https://nati.com", age="35"),
+              User(id= 2, name= "Rodrigo", surname="Rodri", url="https://rodri.com", age="25")]
 
 @app.get("/usersjson")
 async def usersjson():
@@ -34,3 +35,14 @@ async def usersjson():
 @app.get("/users")
 async def users():
     return users_list
+
+# Tenemos una clase que hereda el comportamiento de BaseModel
+# Le damos un nombre relacionado con la opración que va a realizar
+# Le pasamos un parámetro, en este caso será el id
+@app.get("/user/{id}") # El path /user/{id} tiene un path parameter "id" que debería ser un int.
+async def users(id: int): # Le pasamos el parámetro tipado, en este caso es si o si un entero: int.
+    users = filter(lambda user: user.id == id, users_list) # Filter: función pre cargada en python y es una función superior
+    try:
+        return list(users)[0]
+    except:
+        return {"error": "No se ha encontrado el Usuario"}
