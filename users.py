@@ -56,7 +56,7 @@ async def users(id: int): # Le pasamos el parámetro tipado, en este caso es si 
 async def users(id: int): # Le pasamos el parámetro tipado, en este caso es si o si un entero: int.
     return search_user(id)
     
-## Operación POST:
+## Operación POST: Agregar
 ### Para que cualquier operación esté expuesta en la API: @app + el tipo de operación, es suficiente.
 @app.post("/user/") 
     # Implementamos la operación:
@@ -65,6 +65,34 @@ async def user(user: User): ## Le pasamos lo que queremos agregar, en este caso 
         return {"error": "El usuario ya existe"}
     else:
         users_list.append(user) ## append: Agrega elementos a una lista.
+        ## Buena práctica, si de verdad se ha agregado, retorno el usuario.
+        return user
+## Operación PUT: Actualiza
+### Actualizar el usuario completo.
+### Se puede actualizar los parámetros por separado, para esto debe utilizar PATCH.
+@app.put("/user/")
+async def user(user: User): ## Le pasamos el usuario que queremos actualizar.
+    found = False # Una variable para controlar si he llegado al usuario o no,
+    # Recorremos la lista y si encontramos un usuarioio que coincida con el que queremos actualizar, pues se actualiza.
+    for index, saved_user in enumerate(users_list): ## Enumerate, es una clase de Python para enumerar los elementos de la lista.
+        if saved_user.id == user.id: # Si lo encontramos, accedemos a él.
+            users_list[index] = user # Acceder al que hemos encontrado.
+            found = True # Una variable para controlar si he llegado al usuario o no,
+    if not found:
+        return {"error": "No se ha actualizado el Usuario"} # Se puede mejorar el manejo de errores.
+    ## Buena práctica, si de verdad se ha actualizado, retorno el usuario.
+    else:
+        return user
+
+@app.delete("/user/{id}") ## Utilizamos query, porque el ID es obligatorio.
+async def user(id: int): ## Le pasamos el ID del usuario que queremos eliminar.
+    found = False # Una variable para controlar si he llegado al usuario o no,
+    for index, saved_user in enumerate(users_list):
+        if saved_user.id == id:
+            del users_list[index]
+            found = True # Una variable para controlar si he llegado al usuario o no,
+    if not found:
+        return {"error": "No se ha eliminado el usuario"}
     
 # Función para buscar el usuario por id.
 def search_user(id: int):
