@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException ## Es una clase que ya existe en Fast API, la utilizamos cuando queremos lanzar excepciones.
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -58,15 +58,17 @@ async def users(id: int): # Le pasamos el parámetro tipado, en este caso es si 
     
 ## Operación POST: Agregar
 ### Para que cualquier operación esté expuesta en la API: @app + el tipo de operación, es suficiente.
-@app.post("/user/") 
+@app.post("/user/", response_model=User, status_code = 201) ## Añadimos el parámetro status code que queremos que nos devuelva, en este caso es el 201: "Created". It is commonly used after creating a new record in the database. También añadimos el parámetro "response_model" para obtener más detalles en la documentación, en este caso el detale sería todo el objeto User.
     # Implementamos la operación:
 async def user(user: User): ## Le pasamos lo que queremos agregar, en este caso sería una entidad User.
     if type(search_user(user.id)) == User: ## Verificamos si el usuario ya existe en la lista.
-        return {"error": "El usuario ya existe"}
+       raise HTTPException(status_code = 204, detail="El usuario ya existe") ## Añadimos la operación raise, que lanza la execption, no la retorna como el return. Invocamos el HTTPException con el parámetro status code que queremos que nos devuelva, en este caso es el 304. También podemos añadir un parámetro "detail", entonces en vez de retornar el mensaje del error, podemos añadirlo en este parámetro detail.
+        # return {"error": "El usuario ya existe"}
     else:
         users_list.append(user) ## append: Agrega elementos a una lista.
         ## Buena práctica, si de verdad se ha agregado, retorno el usuario.
         return user
+
 ## Operación PUT: Actualiza
 ### Actualizar el usuario completo.
 ### Se puede actualizar los parámetros por separado, para esto debe utilizar PATCH.
