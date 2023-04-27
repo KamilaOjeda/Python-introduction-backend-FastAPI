@@ -1,7 +1,9 @@
-from fastapi import FastAPI, HTTPException ## Es una clase que ya existe en Fast API, la utilizamos cuando queremos lanzar excepciones.
+# from fastapi import FastAPI, HTTPException ## Es una clase que ya existe en Fast API, la utilizamos cuando queremos lanzar excepciones.
+from fastapi import APIRouter, HTTPException ## Ahora importamos APIrouter en vez de solo FastAPI
 from pydantic import BaseModel
 
-app = FastAPI()
+# app = FastAPI()
+router = APIRouter() ## Ahora inicializamos APIrouter, en vez de solo FastAPI y cmabiamos a todas la entidades app por router.
 
 # Iniciar el server: uvicorn users:app --reload
 """
@@ -10,8 +12,7 @@ async def users():
     return "¡Hola, Users!"
 """
 
-# Entidad user
-
+# Entidad User
 class User(BaseModel): # Base Model nos da la capacidad de crear una entidad.
     id: int
     name: str # objeto de tipo Usuario, el nam tiene que ser String
@@ -23,56 +24,73 @@ class User(BaseModel): # Base Model nos da la capacidad de crear una entidad.
 users_list = [User(id= 1, name= "Natalia", surname="Nati", url="https://nati.com", age=35),
               User(id= 2, name= "Rodrigo", surname="Rodri", url="https://rodri.com", age=25)]
 
-## Operación GET, para leer datos.
 
-@app.get("/usersjson")
+# Operación GET: para leer datos.
+
+## @app.get("/usersjson")
+@router.get("/usersjson")
 async def usersjson():
     return [{"id": 1, "name": "Natalia", "surname": "Nati", "url": "https://nati.com", "age": 35},
             {"id": 2, "name": "Rodrigo", "surname": "Rodri", "url": "https://rodri.com", "age": 25},
             {"id": 3, "name": "Patricia", "surname": "Paty", "url": "https://paty.com", "age": 19}]
  
-# Definimos lista users, imaginamos que está en una base de datos.    
-# users = [User("Luciana", "Luci", "https://luci.com", "35")]
+## Definimos lista users, imaginamos que está en una base de datos.    
+## users = [User("Luciana", "Luci", "https://luci.com", "35")]
 
-# Tenemos una clase que hereda el comportamiento de BaseModel
-@app.get("/users")
+## Tenemos una clase que hereda el comportamiento de BaseModel
+
+## @app.get("/users")
+@router.get("/users")
 async def users():
     return users_list
 
-# Tenemos una clase que hereda el comportamiento de BaseModel
-# Le damos un nombre relacionado con la opración que va a realizar
-# Le pasamos un parámetro, en este caso será el id
+## Tenemos una clase que hereda el comportamiento de BaseModel
+## Le damos un nombre relacionado con la opración que va a realizar
+## Le pasamos un parámetro, en este caso será el id
+
 
 # Path
-@app.get("/user/{id}") # El path /user/{id} tiene un path parameter "id" que debería ser un int.
+
+## @app.get("/user/{id}") # El path /user/{id} tiene un path parameter "id" que debería ser un int.
+@router.get("/user/{id}")
 async def users(id: int): # Le pasamos el parámetro tipado, en este caso es si o si un entero: int.
     return search_user(id)
 
-    
-# Limitamos y aseguramos que las peticiones sean las correctas.
+## Limitamos y aseguramos que las peticiones sean las correctas.
+
 
 # Query
-@app.get("/userquery") # El path /user/{id} tiene un path parameter "id" que debería ser un int. Por otro lado, /userquery tmabién podría llamarse solo /user.
-async def users(id: int): # Le pasamos el parámetro tipado, en este caso es si o si un entero: int.
+
+## @app.get("/userquery") ## El path /user/{id} tiene un path parameter "id" que debería ser un int. Por otro lado, /userquery tmabién podría llamarse solo /user.
+@router.get("/userquery")
+async def users(id: int): ## Le pasamos el parámetro tipado, en este caso es si o si un entero: int.
     return search_user(id)
+   
     
-## Operación POST: Agregar
-### Para que cualquier operación esté expuesta en la API: @app + el tipo de operación, es suficiente.
-@app.post("/user/", response_model=User, status_code = 201) ## Añadimos el parámetro status code que queremos que nos devuelva, en este caso es el 201: "Created". It is commonly used after creating a new record in the database. También añadimos el parámetro "response_model" para obtener más detalles en la documentación, en este caso el detale sería todo el objeto User.
-    # Implementamos la operación:
+# Operación POST: Agregar
+
+## Para que cualquier operación esté expuesta en la API: @app + el tipo de operación, es suficiente.
+
+## @app.post("/user/", response_model=User, status_code = 201) ## Añadimos el parámetro status code que queremos que nos devuelva, en este caso es el 201: "Created". It is commonly used after creating a new record in the database. También añadimos el parámetro "response_model" para obtener más detalles en la documentación, en este caso el detale sería todo el objeto User.
+@router.post("/user/", response_model=User, status_code = 201)     
+### Implementamos la operación:
 async def user(user: User): ## Le pasamos lo que queremos agregar, en este caso sería una entidad User.
     if type(search_user(user.id)) == User: ## Verificamos si el usuario ya existe en la lista.
        raise HTTPException(status_code = 204, detail="El usuario ya existe") ## Añadimos la operación raise, que lanza la execption, no la retorna como el return. Invocamos el HTTPException con el parámetro status code que queremos que nos devuelva, en este caso es el 304. También podemos añadir un parámetro "detail", entonces en vez de retornar el mensaje del error, podemos añadirlo en este parámetro detail.
-        # return {"error": "El usuario ya existe"}
+        ### return {"error": "El usuario ya existe"}
     else:
         users_list.append(user) ## append: Agrega elementos a una lista.
-        ## Buena práctica, si de verdad se ha agregado, retorno el usuario.
+        ### Buena práctica, si de verdad se ha agregado, retorno el usuario.
         return user
 
-## Operación PUT: Actualiza
-### Actualizar el usuario completo.
-### Se puede actualizar los parámetros por separado, para esto debe utilizar PATCH.
-@app.put("/user/")
+
+# Operación PUT: Actualiza
+
+## Actualizar el usuario completo.
+## Se puede actualizar los parámetros por separado, para esto debe utilizar PATCH.
+
+# @app.put("/user/")
+@router.put("/user/")
 async def user(user: User): ## Le pasamos el usuario que queremos actualizar.
     found = False # Una variable para controlar si he llegado al usuario o no,
     # Recorremos la lista y si encontramos un usuarioio que coincida con el que queremos actualizar, pues se actualiza.
@@ -86,7 +104,11 @@ async def user(user: User): ## Le pasamos el usuario que queremos actualizar.
     else:
         return user
 
-@app.delete("/user/{id}") ## Utilizamos query, porque el ID es obligatorio.
+
+# Operación DELETE: Elimina
+
+## @app.delete("/user/{id}") ## Utilizamos query, porque el ID es obligatorio.
+@router.delete("/user/{id}")
 async def user(id: int): ## Le pasamos el ID del usuario que queremos eliminar.
     found = False # Una variable para controlar si he llegado al usuario o no,
     for index, saved_user in enumerate(users_list):

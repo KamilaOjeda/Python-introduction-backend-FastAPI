@@ -1,6 +1,12 @@
 from fastapi import FastAPI # Importamos fastAPI
+from routers import products, users #Importamos el fichero de products y users DESDE LA CARPETA ROUTERS, que es donde están ubicados.
 
 app = FastAPI() #Creamos un objeto app, por convención, que instancie la clase FastAPI()
+
+# ROUTERS
+## Accedemos a la instancia app y operacion: include_router
+app.include_router(products.router)
+app.include_router(users.router)
 
 # Creamos una función que se llame root
 # Con @app ya estamos accediendo al contexto de fastAPI
