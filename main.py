@@ -1,6 +1,8 @@
 from fastapi import FastAPI # Importamos fastAPI
 from routers import products, users # Importamos el fichero de products y users DESDE LA CARPETA ROUTERS, que es donde están ubicados.
+
 from fastapi.staticfiles import StaticFiles # Importamos la clase para poder manipular los recursos estáticos.
+
 app = FastAPI() #Creamos un objeto app, por convención, que instancie la clase FastAPI()
 
 # ROUTERS
