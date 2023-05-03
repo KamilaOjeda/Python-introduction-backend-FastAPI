@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm ## 
 app = FastAPI()
 
 # Creamos una instancia de nuestro sistema de autenticación
-oauht2 = OAuth2PasswordBearer(tokenUrl="login")
+oauht2 = OAuth2PasswordBearer(tokenUrl="login") #Se encargará de autogestionar la autenticación
 
 # Entidad User que irá a través de la red / Tmb es un objeto, el obj User
 class User(BaseModel): # Base Model nos da la capacidad de crear una entidad.
@@ -38,33 +38,47 @@ users_db = {
 }
 
 # Definimos una función search_user para buscar algún usuario en la base de datos.
-def search_user(username: str):
+def search_user_db(username: str):
     if username in users_db: ## Si el username ingresado está en la base de datos, entonces,
         return UserDB(**users_db[username]) ## Para hacer este llamado será necesario anteponer los "**", para indicarle que pueden ir varios.
 
-# Definimos un criterio de dependencia
-async def current_user(token: str = Depends(oauht2)):
+# Definimos una función search_user para buscar algún usuario en la base de datos.
+def search_user(username: str):
+    if username in users_db: ## Si el username ingresado está en la base de datos, entonces,
+        return User(**users_db[username]) ## Para hacer este llamado será necesario anteponer los "**", para indicarle que pueden ir varios.
+
+
+# Definimos un criterio de dependencia para la operación:::: @app.get("/users/me")
+async def current_user(token: str = Depends(oauht2)): #Buscamos el token dentro de nuestro sistema de autenticación, que lo ha capturado anteriormente.
     user = search_user(token)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
             detail="Credenciales de autenticación inválidas",
             headers={"www-Authenticate": "Bearer"})
-
+        
+    if user.disabled:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Usuario inactivo")
+            
+    return user
 
 # Implementamos la operación de autenticación, con usuario y contraseña
 @app.post("/login")
 async def login(form: OAuth2PasswordRequestForm = Depends()): ## Significa que una operación va a recibir datos, pero no depende de nadie.
     user_db = users_db.get(form.username) ## Ir a la base de datos users_db y con el GET buscarmos si de verdad está ese usuario.
     if not user_db:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El usuario no es correcto")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="El usuario no es correcto")
     
     user = search_user(form.username)
     ## Comprobar si de  verdad la contraseña que nos ha llegado coincide con la de la base de datos.
     if not form.password == user.password:
-        raise HTTPException(status_code=400, detail="La contraseña no es correcta")
+        raise HTTPException(
+            status_code=400, detail="La contraseña no es correcta")
     
-    return {"access_token": user.username, "token_type": "bearer"} ## Bearer es un standard
+    return {"access_token": user.username, "token_type": "bearer"} ## Bearer es un standard, el sistema tiene que devolver un accestoken, eso es un standard
 
 # Implementamos esta operación para que nos diga cuando estamos autenticados.
 @app.get("/users/me")
